@@ -2,6 +2,7 @@ var express = require("express");
 var admin = require("../inc/admin");
 var router = express.Router();
 var users = require('./../inc/users')
+var menus = require('./../inc/menus')
 
 router.use(function (req, res, next) {
     if (['/login'].indexOf(req.url) === -1 && !req.session.user) {
@@ -63,7 +64,13 @@ router.get('/users', function (req, res, next) {
     res.render('admin/users', admin.getParams(req));
 });
 router.get('/menus', function (req, res, next) {
-    res.render('admin/menus', admin.getParams(req));
+    menus.getMenus().then(data => {
+        res.render('admin/menus', admin.getParams(req, {
+            data
+        }));
+    }).catch(err => {
+        console.error(err);
+    })
 });
 
 module.exports = router;
