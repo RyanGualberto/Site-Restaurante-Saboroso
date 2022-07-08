@@ -57,5 +57,10 @@ router.get('/users', function (req, res, next) {
 
     });
 });
+router.get('/menus', function (req, res, next) {
+    res.render('admin/menus', {
+
+    });
+});
 
 module.exports = router;
