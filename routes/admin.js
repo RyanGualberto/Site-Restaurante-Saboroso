@@ -11,7 +11,7 @@ router.use(function (req, res, next) {
 });
 
 router.get("/logout", function(req, res, next) {
-    del req.session.user;
+    delete req.session.user;
     res.redirect('/admin/login')
 });
 
