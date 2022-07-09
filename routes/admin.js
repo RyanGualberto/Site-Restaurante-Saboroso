@@ -63,14 +63,18 @@ router.get('/emails', function (req, res, next) {
 router.get('/users', function (req, res, next) {
     res.render('admin/users', admin.getParams(req));
 });
-router.get('/menus', function (req, res, next) {
+
+router.get("/menus", function(req, res, next) {
     menus.getMenus().then(data => {
-        res.render('admin/menus', admin.getParams(req, {
+        res.render("admin/menus", admin.getParams(req, {
             data
         }));
-    }).catch(err => {
-        console.error(err);
     })
 });
+
+router.post("/menus", function(req, res, next){
+    res.send(req.body)
+});
+
 
 module.exports = router;
