@@ -1,4 +1,3 @@
-const { query } = require('express');
 var conn = require('./db')
 module.exports = {
     render(req, res, error, sucess) {
@@ -71,5 +70,20 @@ module.exports = {
             });
         })
 
+    },
+    delete(id){
+        return new Promise((resolve, reject) => {
+            conn.query(`
+                DELETE FROM tb_reservations WHERE id = ?
+            `, [
+                id
+            ], (err, results) => {
+                if(err){
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
+        })
     }
 }
