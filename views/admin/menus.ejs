@@ -50,9 +50,9 @@
                   </td>
                   <td>R$<%= row.price %>
                   </td>
-                  <td><button type="button" class="btn btn-xs btn-info btn-update" data-toggle="modal"
-                      data-target="#modal-update"><i class="fa fa-pencil"></i> Editar</button>&nbsp;<button
-                      type="button" class="btn btn-xs btn-danger btn-delete"><i class="fa fa-trash"></i>
+                  <td><button type="button" class="btn btn-xs btn-info btn-update"><i class="fa fa-pencil"></i>
+                      Editar</button>&nbsp;<button type="button" class="btn btn-xs btn-danger btn-delete"><i
+                        class="fa fa-trash"></i>
                       Excluir</button></td>
                 </tr>
                 <% }); %>
@@ -150,7 +150,10 @@
 
   <%- include('includes/admin-footer')-%>
 
+    <script src="/js/SaborosoFileReader.js"></script>
     <script>
+      new SaborosoFileReader("#modal-create [type = file]", "#modal-create img");
+      new SaborosoFileReader("#modal-update [type = file]", "#modal-update img");
       let formCreate = document.querySelector('#modal-create form');
 
       formCreate.addEventListener('submit', e => {
@@ -164,5 +167,32 @@
         });
       });
 
-      console.log(formCreate);
+      let formUpdate = document.querySelector('#modal-update form');
+
+      [...document.querySelectorAll('.btn-update')].forEach(btn => {
+        btn.addEventListener('click', e => {
+          console.log(e);
+          let tr = e.path.find(el => {
+            return (el.tagName.toUpperCase() === 'TR');
+          });
+          let data = JSON.parse(tr.dataset.row)
+          console.log(data);
+          for (let name in data) {
+            switch (name) {
+              case 'photo':
+              formUpdate.querySelector("img").src = '/'+data[name];
+                break;
+
+              default:
+                let input = formUpdate.querySelector(`[name=${name}]`);
+                if (input) {
+                  input.value = data[name]
+                }
+                break;
+            }
+          }
+          $('#modal-update').modal('show');
+        });
+      });
+
     </script>
