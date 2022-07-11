@@ -1,6 +1,5 @@
 let conn = require('./db');
 let path = require('path');
-const { param } = require('../routes');
 
 module.exports = {
     getMenus() {
