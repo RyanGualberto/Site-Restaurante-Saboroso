@@ -58,7 +58,7 @@ module.exports = {
             } else {
                 query = `
                 INSERT INTO tb_reservations(name, email, people, date, time)
-                VALUES(?,?,?,?,?)
+                VALUES(?,?,?,?,?,?)
                 `;
             }
 
