@@ -1,3 +1,4 @@
+const { query } = require('express');
 var conn = require('./db')
 module.exports = {
     render(req, res, error, sucess) {
@@ -7,25 +8,49 @@ module.exports = {
             background: 'images/img_bg_2.jpg',
             h1: 'Reserve uma Mesa!',
             body: req.body,
-            error, 
+            error,
             sucess
         });
     },
 
     save(fields) {
         return new Promise((s, f) => {
-            let date = fields.date.split('/');
-            fields.date = `${date[2]}-${date[1]}-${date[0]}`
-            conn.query(`
-            INSERT INTO tb_reservations(name, email, people, date, time)
-            VALUES(?,?,?,?,?)
-            `, [
+            if (fields.date.indexOf('/') > -1) {
+
+                let date = fields.date.split('/');
+                fields.date = `${date[2]}-${date[1]}-${date[0]}`
+            }
+
+
+            let query, params = [
                 fields.name,
                 fields.email,
                 fields.people,
                 fields.date,
                 fields.time
-            ], (err, results) => {
+            ];
+
+            if (parseInt(fields.id) > 0) {
+                query = `
+                        UPDATE tb_reservations 
+                        SET 
+                            name = ?,
+                            email = ?,
+                            people = ?,
+                            date = ?,
+                            time = ?
+                        Where id = ?
+                    `;
+
+                params.push(fields.id);
+            } else {
+                query = `
+                INSERT INTO tb_reservations(name, email, people, date, time)
+                VALUES(?,?,?,?,?)
+                `;
+            }
+
+            conn.query(query, params, (err, results) => {
                 if (err) {
                     f(err);
                 } else {
