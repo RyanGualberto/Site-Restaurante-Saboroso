@@ -223,6 +223,21 @@
 
       new SaborosoGrid({
         deleteUrl: '/admin/reservations/${data.id}',
-        deleteMsg: 'Deseja Realmente Excluir A Reserva De ${data.name}?'
+        deleteMsg: 'Deseja Realmente Excluir A Reserva De ${data.name}?',
+        onUpdateLoad: (form, name, data) => {
+          let input = form.querySelector(`[name=${name}]`);
+          switch (name) {
+            case 'date':
+              if (input) {
+                input.value = moment(data[name]).format("YYYY-MM-DD")
+              }
+              break;
+            default:
+              if (input) {
+                input.value = data[name]
+              }
+              break;
+          }
+        }
       });
     </script>
