@@ -1,11 +1,16 @@
 class SaborosoGrid {
     constructor(configs) {
+        configs.listeners = Object.assign({
+            afterUpdateClick: (e) => {
+                $('#modal-update').modal('show');
+            }
+        }, configs.listeners)
         this.options = Object.assign({}, {
-            formCreate:  '#modal-create form',
+            formCreate: '#modal-create form',
             formUpdate: '#modal-update form',
             btnUpdate: '.btn-update',
-            btnDelete: '.btn-delete'
-        }, configs) ;
+            btnDelete: '.btn-delete',
+        }, configs);
 
         this.initForms();
         this.initButtons();
@@ -29,11 +34,16 @@ class SaborosoGrid {
 
     }
 
+    fireEvent(name, args) {
+        if (typeof this.options.listeners[name] === 'function') {
+            this.options.listeners[name].apply(name, args)
+        }
+    }
+
     initButtons() {
 
         [...document.querySelectorAll(this.options.btnUpdate)].forEach(btn => {
             btn.addEventListener('click', e => {
-                console.log(e);
                 let tr = e.path.find(el => {
                     return (el.tagName.toUpperCase() === 'TR');
                 });
@@ -55,7 +65,8 @@ class SaborosoGrid {
                             break;
                     }
                 }
-                $('#modal-update').modal('show');
+                this.fireEvent('afterUpdateClick', [e])
+
             });
         });
 
