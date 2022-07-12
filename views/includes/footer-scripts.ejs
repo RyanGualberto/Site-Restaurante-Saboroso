@@ -20,7 +20,22 @@
 
 <script src="js/moment.min.js"></script>
 <script src="js/bootstrap-datetimepicker.min.js"></script>
-
+<script src="/js/SaborosoFormSave.js"></script>
 
 <!-- Main -->
 <script src="js/main.js"></script>
+
+<script>
+    let formSubscribe = document.querySelector('#form-subscribe');
+
+    if (formSubscribe) {
+        formSubscribe.save({
+            sucess: ()=> {
+                alert("Email Cadastrado Com Sucesso!");
+            },
+            failure(err){
+                alert(err)
+            }
+        });
+    }
+</script>

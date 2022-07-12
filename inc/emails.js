@@ -2,8 +2,8 @@ var conn = require('./db')
 
 module.exports = {
     render(req, res, error, sucess){
-        res.render('contacts', {
-            title: 'Contato - Restaurante Saboroso!',
+        res.render('emails', {
+            title: 'Email - Restaurante Saboroso!',
             background: 'images/img_bg_3.jpg',
             h1: 'Diga Um Oi!',
             body: req.body,
@@ -12,29 +12,30 @@ module.exports = {
         });
     },
 
-    save(fields){
+    save(req){
         return new Promise((s, f) => {
-            conn.query(`
-                INSERT INTO tb_contacts (name, email, message)
-                VALUES(?, ?, ?)
-            `,[
-                fields.name,
-                fields.email,
-                fields.message
-            ],(err,results) => {
-                if(err){
-                    f(err);
-                } else {
-                    s(results);
-                }
-            });
+            if (!req.fields.email) {
+                f( 'Preencha O Email.');
+            } else {
+                conn.query(`
+                INSERT INTO tb_emails (email) VALUES (?)
+                `, [
+                    req.fields.email
+                ], (err, results) => {
+                    if(err){
+                        f(err.message);
+                    } else {
+                        s(results);
+                    }
+                })
+            }
         });
     },
 
-    getContacts() {
+    getEmails() {
         return new Promise((resolve, reject) => {
             conn.query(`
-                 SELECT * FROM tb_contacts ORDER BY register DESC
+                 SELECT * FROM tb_emails ORDER BY email 
                 `, (err, results) => {
                 if (err) {
                     reject(err);
@@ -47,7 +48,7 @@ module.exports = {
     delete(id){
         return new Promise((resolve, reject) => {
             conn.query(`
-                DELETE FROM tb_contacts WHERE id = ?
+                DELETE FROM tb_emails WHERE id = ?
             `, [
                 id
             ], (err, results) => {
