@@ -12,13 +12,30 @@ module.exports = {
             sucess
         });
     },
-    getReservations(page) {
-        if (!page) page = 1;
+    getReservations(req) {
+        return new Promise((s, f) => {
+            let page = req.query.page;
+            let dtstart = req.query.dtstart;
+            let dtend = req.query.dtend;
+            if (!page) page = 1;
 
-        let pag = new Pagination(`
-             SELECT SQL_CALC_FOUND_ROWS * FROM tb_reservations ORDER BY name LIMIT ?,?
-        `);
-        return pag.getPage(page)
+            let params = [];
+
+            if (dtstart && dtend) params.push(dtstart, dtend);
+
+            let pag = new Pagination(`
+                 SELECT SQL_CALC_FOUND_ROWS * 
+                 FROM tb_reservations 
+                 ${(dtstart && dtend) ? 'WHERE date BETWEEN ? AND ?' : ''}
+                 ORDER BY name LIMIT ?,?
+            `, params);
+            pag.getPage(page).then(data => {
+                s({
+                    data,
+                    links: pag.getNavigation(req.query)
+                })
+            })
+        })
     },
 
     save(fields) {
