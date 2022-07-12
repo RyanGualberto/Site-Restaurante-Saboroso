@@ -7,7 +7,6 @@ var menus = require('./../inc/menus');
 var contacts = require('./../inc/contacts');
 var reservations = require('./../inc/reservations');
 var emails = require("../inc/emails");
-
 var moment = require('moment');
 moment.locale("pt-BR")
 
