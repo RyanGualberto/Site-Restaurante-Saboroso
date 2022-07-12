@@ -23,8 +23,8 @@ class SaborosoGrid {
         this.options = Object.assign({}, {
             formCreate: '#modal-create form',
             formUpdate: '#modal-update form',
-            btnUpdate: '.btn-update',
-            btnDelete: '.btn-delete',
+            btnUpdate: 'btn-update',
+            btnDelete: 'btn-delete',
             onUpdateLoad: (form, name, data) => {
                 let input = form.querySelector('[name=' + name + ']');
                 if (input) {
@@ -33,6 +33,7 @@ class SaborosoGrid {
             }
         }, configs);
 
+        this.rows = [...document.querySelectorAll('table tbody tr')];
         this.initForms();
         this.initButtons();
     }
@@ -41,16 +42,24 @@ class SaborosoGrid {
         this.formCreate = document.querySelector(this.options.formCreate);
         this.formUpdate = document.querySelector(this.options.formUpdate);
 
-        this.formCreate.save().then(json => {
-            this.fireEvent('afterFormCreate');
-        }).catch(err => {
-            this.fireEvent('afterFormCreateError');
+        this.formCreate.save({
+            sucess: () => {
+                this.fireEvent('afterFormCreate');
+            },
+            failure: err => {
+
+                this.fireEvent('afterFormCreateError');
+            }
         });
 
-        this.formUpdate.save().then(json => {
-            this.fireEvent('afterFormUpdate');
-        }).catch(err => {
-            this.fireEvent('afterFormUpdateError');
+        this.formUpdate.save({
+            sucess: () => {
+                this.fireEvent('afterFormUpdate');
+            },
+            failure: err => {
+
+                this.fireEvent('afterFormUpdateError');
+            }
         });
 
     }
@@ -67,33 +76,41 @@ class SaborosoGrid {
         return JSON.parse(tr.dataset.row)
     }
 
-    initButtons() {
+    btnUpdateClick(e) {
+        let data = this.getTrData(e);
+        for (let name in data) {
+            this.options.onUpdateLoad(this.formUpdate, name, data);
+            console.log(data)
+        }
+        this.fireEvent('afterUpdateClick', [e])
+    }
 
-        [...document.querySelectorAll(this.options.btnUpdate)].forEach(btn => {
-            btn.addEventListener('click', e => {
-                let data = this.getTrData(e);
-                for (let name in data) {
-                    this.options.onUpdateLoad(this.formUpdate, name, data);
-                    console.log(data)
-                }
-                this.fireEvent('afterUpdateClick', [e])
-
-            });
-        });
-
-        [...document.querySelectorAll(this.options.btnDelete)].forEach(btn => {
-            btn.addEventListener('click', e => {
-                let data = this.getTrData(e);
-                if (confirm(eval('`' + this.options.deleteMsg + '`'))) {
-                    fetch(eval('`' + this.options.deleteUrl + '`'), {
-                        method: 'DELETE'
-                    })
-                        .then(response => response.json())
-                        .then(json => {
-                            this.fireEvent('afterDeleteClick')
-                        });
-                }
+    btnDeleteClick(e) {
+        let data = this.getTrData(e);
+        if (confirm(eval('`' + this.options.deleteMsg + '`'))) {
+            fetch(eval('`' + this.options.deleteUrl + '`'), {
+                method: 'DELETE'
             })
+                .then(response => response.json())
+                .then(json => {
+                    this.fireEvent('afterDeleteClick')
+                });
+        }
+    }
+
+    initButtons() {
+        this.rows.forEach(row => {
+            [...row.querySelectorAll('.btn')].forEach(btn => {
+                btn.addEventListener('click', e => {
+                    if (e.target.classList.contains(this.options.btnUpdate)) {
+                        this.btnUpdateClick(e)
+                    } else if (e.target.classList.contains(this.options.btnDelete)) {
+                        this.btnDeleteClick(e);
+                    } else {
+                        this.fireEvent('buttonClick', [e.target, this.getTrData(e), e])
+                    }
+                });
+            });
         });
     }
 }
